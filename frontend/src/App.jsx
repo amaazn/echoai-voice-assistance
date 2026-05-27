@@ -10,6 +10,7 @@ export default function App() {
   const [phase, setPhase] = useState("idle"); // idle | listening | thinking | speaking
   const [turns, setTurns] = useState([]); // conversation: {role, text}
   const [error, setError] = useState("");
+  const [lang, setLang] = useState("en"); // "en" or "hi" — which language you'll speak
 
   // --- machinery that doesn't need to trigger re-renders ---
   const mediaRecorderRef = useRef(null);
@@ -59,9 +60,19 @@ export default function App() {
     barsRef.current.forEach((b) => b && (b.style.transform = "scaleY(0.08)"));
   }
 
+  // Stop any reply that's currently playing (used to interrupt EchoAI).
+  function stopAudio() {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.onended = null;
+      currentAudioRef.current = null;
+    }
+  }
+
   // ---------- RECORDING ----------
   async function startRecording() {
     setError("");
+    stopAudio(); // if EchoAI is mid-sentence, cut it off so we can listen now
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -112,6 +123,7 @@ export default function App() {
     try {
       const form = new FormData();
       form.append("audio", blob, "speech.webm");
+      form.append("language", lang); // tell the backend which language to expect
       const res = await fetch(`${BACKEND_URL}/talk`, { method: "POST", body: form });
       if (!res.ok) throw new Error("Server error " + res.status);
       const data = await res.json();
@@ -139,13 +151,13 @@ export default function App() {
 
   const isListening = phase === "listening";
   const orbClick = isListening ? stopRecording : startRecording;
-  const orbDisabled = phase === "thinking" || phase === "speaking";
+  const orbDisabled = phase === "thinking"; // can interrupt while speaking, only wait while thinking
 
   const phaseLabel = {
     idle: "Tap the orb and start speaking",
     listening: "Listening…",
     thinking: "Thinking…",
-    speaking: "Speaking…",
+    speaking: "Speaking… (tap the orb to interrupt)",
   }[phase];
 
   // ---------- WELCOME SCREEN ----------
@@ -173,6 +185,7 @@ export default function App() {
             Start talking →
           </button>
           <p className="hint">Powered by open models · Whisper · Qwen · Kokoro</p>
+          <p className="credit">Made by Amaan</p>
         </div>
       </div>
     );
@@ -194,24 +207,42 @@ export default function App() {
       </header>
 
       <main className="conversation">
-        {turns.length === 0 && (
+        {turns.length === 0 ? (
           <div className="empty">
             <p>Say hello 👋</p>
             <p className="empty-sub">Speak in English or Hindi — ask me anything</p>
           </div>
-        )}
-        {turns.map((t, i) => (
-          <div key={i} className={`bubble ${t.role}`}>
-            <div className="who">{t.role === "user" ? "You" : "EchoAI"}</div>
-            <div className="text">{t.text}</div>
+        ) : (
+          <div className="messages">
+            {turns.map((t, i) => (
+              <div key={i} className={`bubble ${t.role}`}>
+                <div className="who">{t.role === "user" ? "You" : "EchoAI"}</div>
+                <div className="text">{t.text}</div>
+              </div>
+            ))}
+            <div ref={transcriptEndRef} />
           </div>
-        ))}
-        <div ref={transcriptEndRef} />
+        )}
       </main>
 
       {error && <div className="error">{error}</div>}
 
       <footer className="controls">
+        <div className="lang-toggle">
+          <button
+            className={lang === "en" ? "active" : ""}
+            onClick={() => setLang("en")}
+          >
+            EN
+          </button>
+          <button
+            className={lang === "hi" ? "active" : ""}
+            onClick={() => setLang("hi")}
+          >
+            हिंदी
+          </button>
+        </div>
+
         <div className={`orb-wrap ${phase}`}>
           {/* live audio bars (only animate while listening) */}
           <div className={`visualizer ${isListening ? "on" : ""}`}>

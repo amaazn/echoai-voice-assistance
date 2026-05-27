@@ -25,18 +25,20 @@ def _get_model():
     return _model
 
 
-def transcribe(audio_bytes: bytes) -> tuple[str, str]:
+def transcribe(audio_bytes: bytes, language: str | None = None) -> tuple[str, str]:
     """
-    Take raw audio bytes (the .webm Blob from the browser) and return
-    (text, language). We let Whisper AUTO-DETECT the language so the user can
-    speak English or Hindi; `info.language` tells us which it heard (e.g. "en", "hi").
+    Take raw audio bytes (the .webm Blob from the browser) and return (text, language).
+    If `language` is given ("en"/"hi"), we FORCE Whisper to that language — far more
+    reliable than auto-detect, which often guesses wrong on short clips. If it's None,
+    Whisper auto-detects and we return whatever it heard.
     faster-whisper decodes the audio internally (it uses ffmpeg under the hood).
     """
     model = _get_model()
     segments, info = model.transcribe(
         io.BytesIO(audio_bytes),  # wrap bytes as a file-like object
+        language=language,        # None = auto-detect; "en"/"hi" = force it
         beam_size=1,              # beam_size=1 is fastest (greedy) = lower latency
         vad_filter=True,          # skip silence -> faster + cleaner transcript
     )
     text = "".join(seg.text for seg in segments).strip()
-    return text, info.language
+    return text, (language or info.language)

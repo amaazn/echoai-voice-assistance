@@ -10,7 +10,7 @@ Run it with:  uvicorn server:app --host 0.0.0.0 --port 8000
 import base64
 import time
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 
 import asr
@@ -47,13 +47,14 @@ def reset():
 
 
 @app.post("/talk")
-async def talk(audio: UploadFile = File(...)):
+async def talk(audio: UploadFile = File(...), language: str = Form("en")):
     timings = {}
     audio_bytes = await audio.read()
 
-    # 1) Speech -> text (also detects the language: "en", "hi", ...)
+    # 1) Speech -> text. `language` comes from the EN/HI toggle in the UI, so we
+    # force Whisper to it (reliable) instead of letting it guess.
     t0 = time.time()
-    transcript, lang = asr.transcribe(audio_bytes)
+    transcript, lang = asr.transcribe(audio_bytes, language=language)
     timings["asr_ms"] = round((time.time() - t0) * 1000)
 
     if not transcript:
