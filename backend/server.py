@@ -51,9 +51,9 @@ async def talk(audio: UploadFile = File(...)):
     timings = {}
     audio_bytes = await audio.read()
 
-    # 1) Speech -> text
+    # 1) Speech -> text (also detects the language: "en", "hi", ...)
     t0 = time.time()
-    transcript = asr.transcribe(audio_bytes)
+    transcript, lang = asr.transcribe(audio_bytes)
     timings["asr_ms"] = round((time.time() - t0) * 1000)
 
     if not transcript:
@@ -66,9 +66,9 @@ async def talk(audio: UploadFile = File(...)):
     timings["llm_ms"] = round((time.time() - t0) * 1000)
     conversation.append({"role": "assistant", "content": reply})
 
-    # 3) Reply text -> speech, then base64-encode so it fits in JSON
+    # 3) Reply text -> speech (voice matches the detected language), then base64
     t0 = time.time()
-    wav_bytes = tts.synthesize(reply)
+    wav_bytes = tts.synthesize(reply, lang=lang)
     timings["tts_ms"] = round((time.time() - t0) * 1000)
     audio_b64 = base64.b64encode(wav_bytes).decode("utf-8")
 
@@ -77,6 +77,7 @@ async def talk(audio: UploadFile = File(...)):
     return {
         "transcript": transcript,
         "reply": reply,
+        "language": lang,
         "audio": audio_b64,
         "timings": timings,
     }

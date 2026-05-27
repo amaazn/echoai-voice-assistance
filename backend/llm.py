@@ -14,19 +14,16 @@ _client = OpenAI(base_url=config.LLM_BASE_URL, api_key=config.LLM_API_KEY)
 
 
 def _build_system_prompt() -> str:
-    """Turn knowledge.json into the hidden instructions that ground the model."""
+    """Turn knowledge.json into the hidden instructions that shape the assistant."""
     with open(config.KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
         kb = json.load(f)
 
-    facts = "\n".join(f"- {fact}" for fact in kb["facts"])
     rules = "\n".join(f"- {rule}" for rule in kb["rules"])
 
     return (
-        f"You are {kb['assistant_name']}, the voice assistant for "
-        f"{kb['business_name']}.\n"
+        f"You are {kb['assistant_name']}, a real-time voice assistant.\n"
         f"{kb['description']}\n\n"
         f"Tone: {kb['tone']}\n\n"
-        f"What you know (these are the ONLY facts you may use):\n{facts}\n\n"
         f"Rules you must follow:\n{rules}"
     )
 

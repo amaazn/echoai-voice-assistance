@@ -6,9 +6,9 @@ the default — exactly like process.env.NAME || default in Node.
 import os
 
 # ---- ASR (speech -> text) ----
-# Whisper model size. "base" is fast and fine for a demo; "small"/"medium"
-# are more accurate but slower. "int8" = run in lower precision = faster.
-ASR_MODEL = os.getenv("ASR_MODEL", "base")
+# Whisper model size. "small" handles Hindi + English much better than "base".
+# "int8" = run in lower precision = faster.
+ASR_MODEL = os.getenv("ASR_MODEL", "small")
 ASR_DEVICE = os.getenv("ASR_DEVICE", "cuda")        # "cuda" = GPU, "cpu" = laptop
 ASR_COMPUTE = os.getenv("ASR_COMPUTE", "int8")
 
@@ -21,8 +21,11 @@ LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "200"))  # keep replies short =
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.4"))
 
 # ---- TTS (text -> speech) ----
-TTS_VOICE = os.getenv("TTS_VOICE", "af_heart")  # a Kokoro voice preset
+# Kokoro voices, chosen per language. English uses an American-English voice;
+# Hindi uses a Hindi voice. Kokoro lang codes: "a" = US English, "h" = Hindi.
+TTS_VOICE_EN = os.getenv("TTS_VOICE_EN", "af_heart")
+TTS_VOICE_HI = os.getenv("TTS_VOICE_HI", "hf_alpha")
 TTS_SAMPLE_RATE = 24000                          # Kokoro outputs 24kHz audio
 
-# ---- Where the grounding facts live ----
+# ---- Assistant persona / behavior ----
 KNOWLEDGE_FILE = os.getenv("KNOWLEDGE_FILE", "knowledge.json")

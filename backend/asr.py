@@ -25,17 +25,18 @@ def _get_model():
     return _model
 
 
-def transcribe(audio_bytes: bytes) -> str:
+def transcribe(audio_bytes: bytes) -> tuple[str, str]:
     """
-    Take raw audio bytes (the .webm Blob from the browser) and return text.
+    Take raw audio bytes (the .webm Blob from the browser) and return
+    (text, language). We let Whisper AUTO-DETECT the language so the user can
+    speak English or Hindi; `info.language` tells us which it heard (e.g. "en", "hi").
     faster-whisper decodes the audio internally (it uses ffmpeg under the hood).
     """
     model = _get_model()
-    segments, _info = model.transcribe(
+    segments, info = model.transcribe(
         io.BytesIO(audio_bytes),  # wrap bytes as a file-like object
-        language="en",            # force English; remove to auto-detect
         beam_size=1,              # beam_size=1 is fastest (greedy) = lower latency
         vad_filter=True,          # skip silence -> faster + cleaner transcript
     )
     text = "".join(seg.text for seg in segments).strip()
-    return text
+    return text, info.language

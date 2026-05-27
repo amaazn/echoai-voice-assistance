@@ -1,6 +1,6 @@
-// Where the Python backend lives.
-// Locally during dev it's localhost:8000.
-// Later, when we deploy on JarvisLabs, we just change this one line
-// to the JarvisLabs URL and the whole frontend points at the GPU box.
+// Where the Python backend lives (running on the JarvisLabs GPU).
+// This is the public proxy URL for port 8000 on the instance.
+// If the instance changes, update this one line (no trailing slash).
 export const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://d698814168740.notebooksn.jarvislabs.net/proxy/8000";

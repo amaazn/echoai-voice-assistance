@@ -197,7 +197,7 @@ export default function App() {
         {turns.length === 0 && (
           <div className="empty">
             <p>Say hello 👋</p>
-            <p className="empty-sub">Try: “What are your opening hours?”</p>
+            <p className="empty-sub">Speak in English or Hindi — ask me anything</p>
           </div>
         )}
         {turns.map((t, i) => (
