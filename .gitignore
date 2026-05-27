@@ -1,0 +1,30 @@
+# ---- Node / frontend ----
+node_modules/
+dist/
+.vite/
+*.local
+
+# ---- Python / backend ----
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+*.egg-info/
+
+# ---- Model / cache files (downloaded on the GPU, never committed) ----
+*.bin
+*.pt
+*.onnx
+.cache/
+models--*/
+
+# ---- Env & secrets ----
+.env
+.env.*
+
+# ---- OS / editor noise ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

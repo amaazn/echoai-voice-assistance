@@ -1,0 +1,20 @@
+# ---- Web server (the "Express" layer) ----
+fastapi              # web framework: defines routes/endpoints
+uvicorn[standard]    # the server that runs FastAPI (like `node server.js`)
+python-multipart     # lets FastAPI receive uploaded files (our audio Blob)
+
+# ---- AI models ----
+faster-whisper       # ASR: speech -> text (optimized Whisper)
+openai               # client to call the LLM (vLLM speaks the OpenAI API)
+kokoro>=0.9.2        # TTS: text -> speech (small, fast voice model)
+soundfile            # read/write audio (WAV) so we can send it to the browser
+
+# ---- Helpers ----
+numpy                # audio is just arrays of numbers; numpy handles them
+
+# ---- NOTE: installed only on the JarvisLabs GPU box, NOT your laptop ----
+# torch              -> the engine that runs the models on the GPU.
+#                       Installed via JarvisLabs (they preinstall the right
+#                       CUDA/GPU build), so we don't pin it here.
+# vllm               -> the fast LLM server. Runs as its own process on the GPU.
+#                       Installed separately on JarvisLabs (it's heavy).
