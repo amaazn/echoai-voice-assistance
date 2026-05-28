@@ -6,9 +6,10 @@ the default — exactly like process.env.NAME || default in Node.
 import os
 
 # ---- ASR (speech -> text) ----
-# Whisper model size. "small" handles Hindi + English much better than "base".
-# "int8" = run in lower precision = faster.
-ASR_MODEL = os.getenv("ASR_MODEL", "small")
+# Whisper model size. "medium" gives a big jump in Hindi accuracy over "small".
+# It's ~1.5 GB but fits comfortably on the A30 alongside vLLM.
+# "int8" = run in lower precision = much faster, marginal accuracy loss.
+ASR_MODEL = os.getenv("ASR_MODEL", "medium")
 ASR_DEVICE = os.getenv("ASR_DEVICE", "cuda")        # "cuda" = GPU, "cpu" = laptop
 ASR_COMPUTE = os.getenv("ASR_COMPUTE", "int8")
 

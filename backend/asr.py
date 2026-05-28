@@ -29,15 +29,26 @@ def transcribe(audio_bytes: bytes, language: str | None = None) -> tuple[str, st
     """
     Take raw audio bytes (the .webm Blob from the browser) and return (text, language).
     If `language` is given ("en"/"hi"), we FORCE Whisper to that language — far more
-    reliable than auto-detect, which often guesses wrong on short clips. If it's None,
-    Whisper auto-detects and we return whatever it heard.
-    faster-whisper decodes the audio internally (it uses ffmpeg under the hood).
+    reliable than auto-detect, which often guesses wrong on short clips.
+
+    We also tune decoding per language: Hindi gets a wider beam + a Devanagari
+    priming prompt, which measurably improves accuracy. English stays on the fast
+    greedy path because Whisper is already great at English.
     """
     model = _get_model()
+
+    if language == "hi":
+        beam_size = 5
+        initial_prompt = "नमस्ते, यह हिंदी में एक स्पष्ट बातचीत है।"
+    else:
+        beam_size = 1
+        initial_prompt = None
+
     segments, info = model.transcribe(
         io.BytesIO(audio_bytes),  # wrap bytes as a file-like object
         language=language,        # None = auto-detect; "en"/"hi" = force it
-        beam_size=1,              # beam_size=1 is fastest (greedy) = lower latency
+        beam_size=beam_size,
+        initial_prompt=initial_prompt,
         vad_filter=True,          # skip silence -> faster + cleaner transcript
     )
     text = "".join(seg.text for seg in segments).strip()

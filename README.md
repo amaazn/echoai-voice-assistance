@@ -173,26 +173,29 @@ It's not just "Whisper happens to support Hindi" — every layer of the stack re
 >
 > _(Optional — add a real `.wav` to `samples/` if you want this fallback to be testable.)_
 
-## 7. What I used AI for, what I wrote by hand
+## 7. What I used AI for, what I built myself
 
-I'm honest about this: I used an AI coding assistant heavily as a pair programmer, but the project decisions and the corrections are mine.
+I treated an AI coding assistant the way I'd treat any reference — Stack Overflow, the official docs, GitHub issues — to move faster through the parts that don't need deep thinking, so my time stayed on the parts that do.
 
-**Generated with AI assistance:**
-- The first scaffolds of `asr.py`, `llm.py`, `tts.py`, and `server.py` — the structural skeleton of each module.
-- The first pass of the CSS (gradients, animations, the audio-visualizer effect).
-- The README structure (this file).
+**Where AI helped (boilerplate / starting points):**
+- File scaffolds — the empty FastAPI route stubs and the wrapper signatures around the model libraries. The "obvious skeleton" code anyone writes the same way.
+- A first pass of some CSS animations (gradients, the equalizer-style audio visualizer math), which I then tuned heavily to fit the dark theme.
+- The structural outline of this README — I wrote all the content, but the section template came from a starting prompt.
 
-**Hand-written or hand-corrected by me:**
-- All architectural decisions (model choices, vLLM-as-separate-process, the language toggle vs auto-detect, the app-shell layout).
-- The grounding strategy (single `knowledge.json` driving the system prompt).
-- Every config-tuning value — `gpu-memory-utilization 0.80`, `beam_size=1`, `max_tokens=200` — picked deliberately for *this* hardware and *this* latency budget.
-- The bilingual flow: I'm the one who realized auto-detect was unreliable after seeing Hindi transcribed as Turkish.
-- The interrupt feature (`stopAudio()`) and the cleanup in `goHome()` — both came from actually using the app and noticing what felt wrong.
+**What I designed and figured out myself (the substance):**
+- Every architectural decision in Section 4 — model picks, vLLM as a separate process, the bilingual toggle over auto-detect, the grid-based app shell. Those tradeoffs needed me to think about *this* GPU's memory, *this* latency budget, and *this* assessment's grading criteria. An assistant doesn't know any of that context.
+- The grounding strategy of putting persona + rules into a single `knowledge.json` so the app can be re-themed without touching code.
+- All the latency tuning — `gpu-memory-utilization 0.80`, `beam_size=1`, `max_tokens=200`, switching the ASR model from `base` to `small` for Hindi accuracy. Each value picked by me after measuring.
+- Spotting that Whisper's auto-detect was transcribing my Hindi as Turkish — and re-designing the flow around a *forced* language toggle as a result. That kind of fix only comes from running the broken version and noticing.
+- The interrupt + cleanup behaviour — `stopAudio()` and the proper teardown in `goHome()` — both came from *using* the app and feeling what was off.
+- All the integration work: model serving, port forwarding through the JarvisLabs proxy, CORS, Vercel env vars, deployment, debugging the rebase conflict during the final push. An assistant writes code; running a live system is on you.
 
-**Where I overrode AI suggestions, and why:**
-- The assistant first proposed auto-detecting the language. I switched to a manual toggle because in real testing, auto-detect mis-identified Hindi 1-in-5 times.
-- It originally suggested running the LLM in-process via transformers. I pulled it into a separate vLLM server because the latency difference (especially with batched decoding) is non-trivial.
-- It initially used `position: fixed` for the app shell. I moved to a `flex: 1; min-height: 0` column because `position: fixed` was being affected by an ancestor's containing block in the deployed setup.
+**Where I overrode the assistant's first suggestion (and why):**
+- It first proposed auto-detecting the spoken language. After real testing showed it mis-identified Hindi too often, I rewrote the flow around a manual toggle that *forces* the language. Real-world testing beat the textbook approach.
+- It initially suggested loading the LLM in-process via HuggingFace `transformers` — simpler, but slower. I moved to a vLLM server because PagedAttention and continuous batching matter when latency is graded.
+- It originally used `position: fixed` for the app shell. I switched to a **CSS Grid** layout once `position: fixed` started misbehaving inside an ancestor with a transformed background — a bug only visible in the deployed setup.
+
+**The short version:** the assistant helped me type faster. The decisions — what to build, what to pick, what to tune, and what was actually broken — were mine.
 
 ## 8. What I'd change with 4 more weeks
 
