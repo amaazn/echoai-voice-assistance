@@ -95,7 +95,7 @@ cd frontend
 npm install
 npm run dev
 ```
-Then open <http://localhost:5173>.
+Then open https://echoai-voice-assistance.vercel.app/.
 
 > 🔌 Point the frontend at the backend by editing `frontend/src/api.js` — change `BACKEND_URL` to your JarvisLabs port-8000 public URL.
 
