@@ -23,11 +23,17 @@ https://github.com/user-attachments/assets/ff4a4ccf-403d-49a5-95c2-eab40dde5eb5
 
 ### Screenshots
 
-> _Add your screenshots after the demo recording:_
+1.Welcome Screen-><img width="1905" height="1015" alt="Image" src="https://github.com/user-attachments/assets/8c7ff29d-d179-4d7a-b145-926be4f80441" />
+
+<img width="1912" height="996" alt="Image" src="https://github.com/user-attachments/assets/2857012c-a482-4d63-8af3-2e8a99983761" />
+
+<img width="1907" height="1023" alt="Image" src="https://github.com/user-attachments/assets/a036d390-dae9-44e4-b9f1-a17a3b68b5d7" />
 
 | Welcome screen | Conversation |
 |---|---|
 | `[ welcome.png ]` | `[ chat.png ]` |
+
+
 
 ---
 
