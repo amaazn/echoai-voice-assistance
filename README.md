@@ -26,7 +26,7 @@
        2. Copy the resulting URL, paste it below.
      - Or link a YouTube/Loom video. -->
 
-`[ DEMO VIDEO GOES HERE ]`
+https://github.com/user-attachments/assets/ff4a4ccf-403d-49a5-95c2-eab40dde5eb5
 
 ### Screenshots
 
