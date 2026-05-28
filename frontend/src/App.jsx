@@ -11,6 +11,7 @@ export default function App() {
   const [turns, setTurns] = useState([]); // conversation: {role, text}
   const [error, setError] = useState("");
   const [lang, setLang] = useState("en"); // "en" or "hi" — which language you'll speak
+  const [lastTimings, setLastTimings] = useState(null); // { asr_ms, llm_ms, tts_ms, total_ms, wall_ms }
 
   // --- machinery that doesn't need to trigger re-renders ---
   const mediaRecorderRef = useRef(null);
@@ -124,9 +125,16 @@ export default function App() {
       const form = new FormData();
       form.append("audio", blob, "speech.webm");
       form.append("language", lang); // tell the backend which language to expect
+      const t0 = performance.now(); // wall-clock: client perspective
       const res = await fetch(`${BACKEND_URL}/talk`, { method: "POST", body: form });
       if (!res.ok) throw new Error("Server error " + res.status);
       const data = await res.json();
+      const wall_ms = Math.round(performance.now() - t0);
+
+      // Capture timings for the latency badge
+      if (data.timings) {
+        setLastTimings({ ...data.timings, wall_ms });
+      }
 
       setTurns((prev) => [
         ...prev,
@@ -155,7 +163,7 @@ export default function App() {
 
   const phaseLabel = {
     idle: "Tap the orb and start speaking",
-    listening: "Listening…",
+    listening: "Listening… tap STOP when you're done",
     thinking: "Thinking…",
     speaking: "Speaking… (tap the orb to interrupt)",
   }[phase];
@@ -225,6 +233,19 @@ export default function App() {
         )}
       </main>
 
+      {lastTimings && (
+        <div className="latency-badge" title="Per-stage backend latency (server compute only)">
+          <span className="latency-label">Latency</span>
+          <span className="latency-main">
+            ⚡ {(lastTimings.total_ms / 1000).toFixed(2)}s
+            <span className="latency-detail">
+              &nbsp;· ASR {lastTimings.asr_ms}ms · LLM {lastTimings.llm_ms}ms · TTS {lastTimings.tts_ms}ms
+              &nbsp;· wall {(lastTimings.wall_ms / 1000).toFixed(2)}s
+            </span>
+          </span>
+        </div>
+      )}
+
       {error && <div className="error">{error}</div>}
 
       <footer className="controls">
@@ -257,9 +278,10 @@ export default function App() {
             disabled={orbDisabled}
             aria-label="microphone"
           >
-            <span className="orb-icon">
-              {phase === "thinking" ? "•••" : isListening ? "■" : "🎤"}
+            <span className={`orb-icon ${isListening ? "stop" : ""}`}>
+              {phase === "thinking" ? "•••" : isListening ? "STOP" : "🎤"}
             </span>
+            {isListening && <span className="rec-dot" aria-hidden="true" />}
           </button>
         </div>
         <p className="controls-hint">{phaseLabel}</p>

@@ -1,11 +1,10 @@
 /* ============ layout ============ */
 .stage {
   position: relative;
-  flex: 1 1 auto;         /* fill #root, which fills the viewport */
-  min-height: 0;
-  height: 100dvh;         /* belt-and-suspenders: lock to viewport height */
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;   /* header (auto) · chat (fills) · orb bar (auto) */
+  height: 100dvh;
+  min-height: 100dvh;
   overflow: hidden;
   background: radial-gradient(circle at 50% -10%, #15162200, #07070b 60%);
 }
@@ -134,7 +133,7 @@
 /* ============ conversation ============ */
 .conversation {
   position: relative; z-index: 1;
-  flex: 1 1 0; min-height: 0; overflow-y: auto;  /* min-height:0 lets it scroll instead of overlapping */
+  min-height: 0; overflow-y: auto;     /* grid 1fr row handles the sizing now */
   padding: 24px 20px 28px;
   display: flex; flex-direction: column;
   max-width: 760px; width: 100%; margin: 0 auto;
@@ -174,6 +173,27 @@
   margin: 0 auto 10px; padding: 10px 16px; max-width: 600px;
   background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5; border-radius: 12px; font-size: 14px; text-align: center;
+}
+
+.latency-badge {
+  position: absolute; right: 16px; bottom: 160px; z-index: 4;
+  display: inline-flex; flex-direction: column; align-items: flex-end; gap: 2px;
+  padding: 8px 14px; border-radius: 14px;
+  font-size: 12px; font-weight: 500; color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  font-variant-numeric: tabular-nums;
+  animation: pop 0.3s ease-out;
+}
+.latency-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.4px;
+  text-transform: uppercase; color: #7c3aed;
+}
+.latency-main { display: inline-flex; align-items: center; }
+.latency-detail { color: #94a3b8; font-weight: 400; }
+@media (max-width: 720px) {
+  .latency-detail { display: none; }
 }
 
 /* ============ controls / mic orb ============ */
@@ -232,6 +252,23 @@
 .orb.speaking { background: linear-gradient(135deg, #0ea5e9, #22d3ee); animation: pulseDim 0.8s infinite; }
 @keyframes pulseDim { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
 .orb-icon { display: inline-block; }
+.orb-icon.stop {
+  font-size: 19px; font-weight: 800; letter-spacing: 1.5px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* small pulsing red dot that says "we're recording right now" */
+.rec-dot {
+  position: absolute; top: 6px; right: 6px; z-index: 3;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  animation: recBlink 1s ease-in-out infinite;
+}
+@keyframes recBlink {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); opacity: 1; }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); opacity: 0.6; }
+}
 
 /* live audio visualizer ring of bars behind the orb */
 .visualizer {
