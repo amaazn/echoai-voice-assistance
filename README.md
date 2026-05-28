@@ -18,13 +18,6 @@
 
 ## 🎬 Demo
 
-> _Drop your demo recording here:_
-
-<!-- Replace this with your video link or embed.
-     - GitHub README plays MP4s uploaded as repo issues/comments:
-       1. Open an issue, drag your .mp4 into the comment box
-       2. Copy the resulting URL, paste it below.
-     - Or link a YouTube/Loom video. -->
 
 https://github.com/user-attachments/assets/ff4a4ccf-403d-49a5-95c2-eab40dde5eb5
 
