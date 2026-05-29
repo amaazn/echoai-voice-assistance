@@ -1,3 +1,9 @@
+---
+
+> ⚠️ **Heads up — backend is paused to save GPU credits.** The live app loads but won't reply with voice unless I start the JarvisLabs GPU. **Please watch the demo video below.** To try it live, email me at amaanahmed_ee22b15_28@dtu.ac.in and I'll spin it up.
+
+---
+
 <h1 align="center">🎙️ EchoAI</h1>
 
 <p align="center">
